@@ -1,0 +1,109 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net10.0-ios</TargetFrameworks>
+
+		<OutputType>Exe</OutputType>
+		<RootNamespace>maui_interop_demo</RootNamespace>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<!-- Display name -->
+		<ApplicationTitle>maui-interop-demo</ApplicationTitle>
+
+		<!-- App Identifier -->
+		<ApplicationId>com.companyname.mauiinteropdemo</ApplicationId>
+
+		<!-- Versions -->
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<ApplicationVersion>1</ApplicationVersion>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- App Icon -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+
+		<!-- Splash Screen -->
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+
+		<!-- Images -->
+		<MauiImage Include="Resources\Images\*" />
+		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
+
+		<!-- Custom Fonts -->
+		<MauiFont Include="Resources\Fonts\*" />
+
+		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+	</ItemGroup>
+
+	<!-- View messages by -v:detailed flag with dotnet build -->
+	<Target Name="CopyXcodeStaticLib" BeforeTargets="PrepareForBuild">
+		<PropertyGroup>
+			<!-- Fallback: if dotnet build didn't pass -c, use Debug -->
+    		<EffectiveConfiguration Condition="'$(Configuration)' == ''">Debug</EffectiveConfiguration>
+    		<EffectiveConfiguration Condition="'$(Configuration)' != ''">$(Configuration)</EffectiveConfiguration>
+
+			<!-- Flags derived from -r value -->
+			<IsSimulator>$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('iossimulator-'))</IsSimulator>
+			<IsDevice>$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('ios-'))</IsDevice>
+
+			<!-- Where to drop the lib so NativeReference can find it -->
+			<NativeDestDir>$(MSBuildProjectDirectory)/Platforms/iOS/Frameworks</NativeDestDir>
+			<NativeLibName>libHelloWorldBridge.a</NativeLibName>
+
+			<!-- Replace with your Xcode project build folder path -->
+			<XcodeBuildDir>$(HOME)/Library/Developer/Xcode/DerivedData/HelloWorldBridge-gqrzvpbxfvvqoyfhmygoqruiwpao/Build/Products</XcodeBuildDir>
+			<XcodeProductsDirSim>$(XcodeBuildDir)/$(EffectiveConfiguration)-iphonesimulator</XcodeProductsDirSim>
+			<XcodeProductsDirDev>$(XcodeBuildDir)/$(EffectiveConfiguration)-iphoneos</XcodeProductsDirDev>
+
+			<!-- Prefer simulator if building for simulator, else device -->
+			<StaticLibSrcSim>$(XcodeProductsDirSim)/$(NativeLibName)</StaticLibSrcSim>
+			<StaticLibSrcDev>$(XcodeProductsDirDev)/$(NativeLibName)</StaticLibSrcDev>
+		</PropertyGroup>
+
+		<Message Importance="High" Text="Using configuration: $(EffectiveConfiguration)" />
+		<RemoveDir Directories="$(NativeDestDir)" />
+		<MakeDir Directories="$(NativeDestDir)" />
+
+		<Copy Condition="'$(IsSimulator)' == 'True' AND Exists('$(StaticLibSrcSim)')"
+				SourceFiles="$(StaticLibSrcSim)"
+				DestinationFiles="$(NativeDestDir)/$(NativeLibName)"
+				SkipUnchangedFiles="true" />
+		<Message Condition="'$(IsSimulator)' == 'True'"
+				Importance="High"
+				Text="RID=$(RuntimeIdentifier) → copied simulator slice: $(StaticLibSrcSim)" />
+
+		<!-- If -r ios-*, copy device slice -->
+		<Copy Condition="'$(IsDevice)' == 'True' AND Exists('$(StaticLibSrcDev)')"
+				SourceFiles="$(StaticLibSrcDev)"
+				DestinationFiles="$(NativeDestDir)/$(NativeLibName)"
+				SkipUnchangedFiles="true" />
+		<Message Condition="'$(IsDevice)' == 'True'"
+				Importance="High"
+				Text="RID=$(RuntimeIdentifier) → copied device slice: $(StaticLibSrcDev)" />
+
+		<!-- Helpful warning when nothing matched -->
+		<Warning Condition="'$(IsSimulator)' != 'True' AND '$(IsDevice)' != 'True'"
+				Text="RuntimeIdentifier '$(RuntimeIdentifier)' not recognised (expected iossimulator-* or ios-*). No copy performed." />		
+		
+		<ItemGroup>
+			<!-- Must match the actual file you copied -->
+			<NativeReference Include="$(NativeDestDir)/$(NativeLibName)">
+				<Kind>Static</Kind>
+				<ForceLoad>true</ForceLoad>
+			</NativeReference>
+		</ItemGroup>
+	</Target>
+
+</Project>
