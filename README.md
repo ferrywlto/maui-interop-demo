@@ -4,7 +4,7 @@ This repository contains a demo project which recorded how I setup a minimal dem
 
 When you click on the button in the app, it will call a Swift function log a hello world message.
 
-![MAUI App Screenshot](/Doc/HelloWorld-ios.png)
+![MAUI App Screenshot](/Doc/MAUI-app-ios.png)
 
 ![Hello World Printed](/Doc/HelloWorld-ios.png)
 
