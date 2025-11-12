@@ -4,9 +4,9 @@ This repository contains a demo project which recorded how I setup a minimal dem
 
 When you click on the button in the app, it will call a Swift function log a hello world message.
 
-![MAUI App Screenshot](./doc/MAUI-app-ios.png)
+![MAUI App Screenshot](doc/MAUI-app-ios.png)
 
-![Hello World Printed](./doc/HelloWorld-ios.png)
+![Hello World Printed](doc/HelloWorld-ios.png)
 
 ## Project Structure
 - Dotnet: .NET MAUI project
