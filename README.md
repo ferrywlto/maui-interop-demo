@@ -2,7 +2,12 @@
 
 This repository contains a demo project which recorded how I setup a minimal demo to achieve interoperability between .NET MAUI and Swift for iOS development.
 
-When you click on the button in the app, it will call a Swift function log a hello world message.
+When you click on the button in the app, it will call a Swift function and log a hello world message.
+
+Both static library and framework approaches are demonstrated in this demo.
+
+Personally I don't see much benefit to use framework over static library for simple interoperability use cases. 
+
 
 ![MAUI App Screenshot](/Doc/MAUI-app-ios.png)
 
@@ -101,3 +106,8 @@ Add the below into `Dotnet/maui-interop-demo.csproj`:
 		</ItemGroup>
 	</Target>
 ```
+
+## References
+- https://learn.microsoft.com/en-us/samples/dotnet/maui-samples/platformintegration-live-activity/
+- https://github.com/dotnet/maui-samples/tree/main/10.0/PlatformIntegration/LiveActivityDemo
+- https://github.com/dotnet/maui/issues/12675
