@@ -20,7 +20,8 @@ public partial class MainPage : ContentPage
 		SemanticScreenReader.Announce(CounterBtn.Text);
 
 #if IOS
-		HelloWorldBridge.SayHello();
+		HelloWorldBridge.SayHelloStaticLib();
+		HelloWorldBridge.SayHelloFramework();
 #endif
 	}
 }

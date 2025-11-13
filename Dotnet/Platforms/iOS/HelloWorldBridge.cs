@@ -4,8 +4,12 @@ using System.Runtime.InteropServices;
 public static class HelloWorldBridge
 {
     [DllImport("__Internal", EntryPoint = "HelloWorldBridge_SayHello")]
-    private static extern void _SayHello();
+    private static extern void _SayHelloStaticLib();
 
-    public static void SayHello() => _SayHello();
+    [DllImport("__Internal", EntryPoint = "HelloWorldFramework_SayHello")]
+    private static extern void _SayHelloFramework();
+
+    public static void SayHelloStaticLib() => _SayHelloStaticLib();
+    public static void SayHelloFramework() => _SayHelloFramework();
 }
 #endif

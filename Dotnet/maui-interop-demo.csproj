@@ -48,7 +48,7 @@
 	</ItemGroup>
 
 	<!-- View messages by -v:detailed flag with dotnet build -->
-	<Target Name="CopyXcodeStaticLib" BeforeTargets="PrepareForBuild">
+	<Target Name="CopyXcodeStaticLib" BeforeTargets="Compile">
 		<PropertyGroup>
 			<!-- Fallback: if dotnet build didn't pass -c, use Debug -->
     		<EffectiveConfiguration Condition="'$(Configuration)' == ''">Debug</EffectiveConfiguration>
@@ -61,6 +61,7 @@
 			<!-- Where to drop the lib so NativeReference can find it -->
 			<NativeDestDir>$(MSBuildProjectDirectory)/Platforms/iOS/Frameworks</NativeDestDir>
 			<NativeLibName>libHelloWorldBridge.a</NativeLibName>
+			<NativeFramework>HelloWorldFramework.framework</NativeFramework>
 
 			<!-- Replace with your Xcode project build folder path -->
 			<XcodeBuildDir>$(HOME)/Library/Developer/Xcode/DerivedData/HelloWorldBridge-gqrzvpbxfvvqoyfhmygoqruiwpao/Build/Products</XcodeBuildDir>
@@ -73,7 +74,7 @@
 		</PropertyGroup>
 
 		<Message Importance="High" Text="Using configuration: $(EffectiveConfiguration)" />
-		<RemoveDir Directories="$(NativeDestDir)" />
+		
 		<MakeDir Directories="$(NativeDestDir)" />
 
 		<Copy Condition="'$(IsSimulator)' == 'True' AND Exists('$(StaticLibSrcSim)')"
@@ -103,6 +104,11 @@
 				<Kind>Static</Kind>
 				<ForceLoad>true</ForceLoad>
 			</NativeReference>
+
+			<NativeReference Include="$(NativeDestDir)/$(NativeFramework)">
+				<Kind>Framework</Kind>
+				<ForceLoad>true</ForceLoad>
+			</NativeReference>			
 		</ItemGroup>
 	</Target>
 

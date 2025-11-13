@@ -8,5 +8,5 @@ import Foundation
 
 @_cdecl("HelloWorldBridge_SayHello")
 public func HelloWorldBridge_SayHello() {
-    NSLog("👋 Hello World from Swift!")
+    NSLog("👋 Hello World from Swift (Static Library)!")
 }
